@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="${daoPackage}.${className}Dao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="${poPackage}.${className}" id="baseResultMap">
+#foreach($column in $columns)
+       <result property="${column.attrname}" column="${column.columnName}"/>
+#end
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+#foreach($column in $columns)
+        ${column.columnName}、
+#end
+        </sql>
+    <!-- 根据主键查询单个 -->
+    <select id="query${className}ByPrimaryKey" parameterType="${poPackage}.${className}"
+            resultMap="baseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM ${tableName}
+        WHERE ${pk.columnName} = #{${pk.attrname},jdbcType=${pk.dataType}}
+    </select>
+
+    <!-- 根据条件查询单个${className} -->
+    <select id="query${className}Info" parameterType="${poPackage}.${className}"
+            resultMap="baseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM ${tableName}
+        <trim prefix="WHERE" prefixOverrides="AND">
+#foreach($column in $columns)
+        <if test="${field.propertyName}!=null">
+            AND ${column.columnName} = #{${column.attrname},jdbcType=${column.dataType}}
+        </if>
+#end
+        </trim>
+    </select>
+
+    <!-- 根据条件查询集合List<${className}> -->
+    <select id="query${className}List" parameterType="${poPackage}.${className}"
+            resultMap="baseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM ${tableName}
+        <trim prefix="WHERE" prefixOverrides="AND">
+#foreach($column in $columns)
+        <if test="${field.propertyName}!=null">
+           AND ${column.columnName} = #{${column.attrname},jdbcType=${column.dataType}}
+        </if>
+#end
+        </trim>
+    </select>
+
+    <!-- 添加单个${className} -->
+    <insert id="add${className}Info" parameterType="${poPackage}.${className}">
+        INSERT INTO ${tableName}
+        <trim prefix="WHERE" prefixOverrides="AND">
+#foreach($column in $columns)
+        <if test="${column.attrname}!=null">
+            ${column.columnName},
+        </if>
+#end
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+#foreach($column in $columns)
+         <if test="${column.attrname}!=null">
+            #{${column.attrname},jdbcType=${column.dataType}},
+         </if>
+#end
+        </trim>
+    </insert>
+
+    <!-- 根据主键修改${className} -->
+    <update id="update${className}ByPrimaryKey" parameterType="${poPackage}.${className}">
+        UPDATE ${tableName}
+        <set>
+#foreach($column in $columns)
+#if(!${column.flag})
+         <if test="${column.attrname}!=null">
+            ${column.columnName} = #{${column.attrname},jdbcType=${column.dataType}}
+         </if>
+#end
+#end
+        </set>
+        WHERE ${pk.columnName} = #${pk.attrname},jdbcType=${pk.dataType}}
+    </update>
+
+    <!-- 根据主键删除${className} -->
+    <delete id="delete${className}ByPrimaryKey" parameterType="${poPackage}.${className}">
+        DELETE
+        FROM ${tableName}
+        WHERE ${pk.columnName} = #{$pk.attrname},jdbcType=${pk.dataType}}
+    </delete>
+
+</mapper>

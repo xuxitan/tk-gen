@@ -1,0 +1,51 @@
+package ${daoPackage};
+
+import ${poPackage}.${className};
+import com.baomidou.mybatisplus.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
+
+/**
+ * ${comments}
+ * @date ${datetime}
+ */
+public interface ${className}Dao{
+
+    /**
+     * 根据主键查询单个
+     * @param entity
+     * @return ${className}
+     */
+        ${className} query${className}ByPrimaryKey(${className} ${classname});
+
+    /**
+     * 根据条件查询单个
+     * @param entity
+     * @return ${className}
+     */
+        ${className} query${className}Info(${className} ${classname});
+
+    /**
+     * 根据条件查询集合
+     * @param entity
+     * @return List<${className}>
+     */
+    List<${className}> query${className}List(${className} ${classname});
+
+    /**
+     * 添加单个
+     * @param entity
+     */
+    void add${className}Info(${className} ${classname});
+
+    /**
+     * 根据主键修改单个
+     * @param entity
+     */
+    void update${className}ByPrimaryKey(${className} ${classname});
+
+    /**
+     * 根据主键删除单个
+     * @param entity
+     */
+    void  delete${className}ByPrimaryKey(${className} ${classname});
+}
