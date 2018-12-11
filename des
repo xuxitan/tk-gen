@@ -1,0 +1,7 @@
+一键生成Entity、Dao、Xm,目前只支持mql
+
+1、下载项目
+2、打成jar包
+3、启动 
+  启动命令：java -jar -Durl=(你的数据连接地址:端口) -Duser=(用户名) -Dpassword=(密码) jar包名
+  例：java -jar -Durl=127.0.0.1:3306 -Duser=root -Dpassword=123456 tk-generator-1.0.0.jar
