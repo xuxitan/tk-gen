@@ -1,4 +1,4 @@
-一键生成Entity、Dao、Xm,目前只支持mql
+一键生成Entity、Dao、Xml,目前只支持mysql
 
 1、下载项目
 2、打成jar包
