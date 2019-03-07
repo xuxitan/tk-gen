@@ -6,7 +6,7 @@
     <!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="${poPackage}.${className}" id="baseResultMap">
 #foreach($column in $columns)
-       <result property="${column.attrname}" column="${column.columnName}"/>
+       <result column="${column.columnName}" property="${column.attrname}" jdbcType="${column.dataType}"/>
 #end
     </resultMap>
 
@@ -17,8 +17,8 @@
 #end
         </sql>
     <!-- 根据主键查询单个 -->
-    <select id="query${className}ByPrimaryKey" parameterType="${poPackage}.${className}"
-            resultMap="baseResultMap">
+    <select id="query${className}ByPrimaryKey" parameterType="${poPackage}.${className}" resultMap="baseResultMap">
+
         SELECT
         <include refid="Base_Column_List"/>
         FROM ${tableName}
@@ -26,14 +26,14 @@
     </select>
 
     <!-- 根据条件查询单个${className} -->
-    <select id="query${className}Info" parameterType="${poPackage}.${className}"
-            resultMap="baseResultMap">
+    <select id="query${className}Info" parameterType="${poPackage}.${className}" resultMap="baseResultMap">
+
         SELECT
         <include refid="Base_Column_List"/>
         FROM ${tableName}
         <trim prefix="WHERE" prefixOverrides="AND">
 #foreach($column in $columns)
-        <if test="${field.propertyName}!=null">
+        <if test="${column.attrname}!= null AND ${column.attrname} != ''">
             AND ${column.columnName} = #{${column.attrname},jdbcType=${column.dataType}}
         </if>
 #end
@@ -41,16 +41,23 @@
     </select>
 
     <!-- 根据条件查询集合List<${className}> -->
-    <select id="query${className}List" parameterType="${poPackage}.${className}"
-            resultMap="baseResultMap">
+    <select id="query${className}List" parameterType="${poPackage}.${className}" resultMap="baseResultMap">
+
         SELECT
         <include refid="Base_Column_List"/>
         FROM ${tableName}
         <trim prefix="WHERE" prefixOverrides="AND">
 #foreach($column in $columns)
-        <if test="${field.propertyName}!=null">
-           AND ${column.columnName} = #{${column.attrname},jdbcType=${column.dataType}}
+#if(${column.dataType} != "TIMESTAMP")
+        <if test="${column.attrname} != null AND ${column.attrname} != ''">
+            AND ${column.columnName} = #{${column.attrname},jdbcType=${column.dataType}}
         </if>
+#end
+#if(${column.dataType} == "TIMESTAMP")
+        <if test="${column.attrname} != null">
+            AND ${column.columnName} = #{${column.attrname},jdbcType=${column.dataType}}
+        </if>
+#end
 #end
         </trim>
     </select>
@@ -60,16 +67,30 @@
         INSERT INTO ${tableName}
         <trim prefix="WHERE" prefixOverrides="AND">
 #foreach($column in $columns)
-        <if test="${column.attrname}!=null">
+#if(${column.dataType} != "TIMESTAMP")
+        <if test="${column.attrname} != null AND ${column.attrname} != ''">
             ${column.columnName},
         </if>
+#end
+#if(${column.dataType} == "TIMESTAMP")
+        <if test="${column.attrname} != null">
+            ${column.columnName},
+        </if>
+#end
 #end
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 #foreach($column in $columns)
-         <if test="${column.attrname}!=null">
-            #{${column.attrname},jdbcType=${column.dataType}},
+#if(${column.dataType} != "TIMESTAMP")
+         <if test="${column.attrname} != null AND ${column.attrname} != ''">
+             #{${column.attrname},jdbcType=${column.dataType}},
          </if>
+#end
+#if(${column.dataType} == "TIMESTAMP")
+        <if test="${column.attrname} != null">
+            #{${column.attrname},jdbcType=${column.dataType}},
+        </if>
+#end
 #end
         </trim>
     </insert>
@@ -80,9 +101,16 @@
         <set>
 #foreach($column in $columns)
 #if(!${column.flag})
-         <if test="${column.attrname}!=null">
-            ${column.columnName} = #{${column.attrname},jdbcType=${column.dataType}}
+#if(${column.dataType} != "TIMESTAMP")
+         <if test="${column.attrname}!= null AND ${column.attrname} != ''">
+             ${column.columnName} = #{${column.attrname},jdbcType=${column.dataType}}
          </if>
+#end
+#if(${column.dataType} == "TIMESTAMP")
+         <if test="${column.attrname}!= null">
+              ${column.columnName} = #{${column.attrname},jdbcType=${column.dataType}}
+         </if>
+#end
 #end
 #end
         </set>

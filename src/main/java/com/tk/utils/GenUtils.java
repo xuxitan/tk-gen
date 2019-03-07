@@ -15,14 +15,14 @@ import org.apache.velocity.app.Velocity;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.StringWriter;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.zip.ZipOutputStream;
 
 /**
  * 代码生成器   工具类
  *
- * @author chenshun
- * @email sunlightcs@gmail.com
+ * @author xuxitan
  * @date 2016年12月19日 下午11:40:24
  */
 public class GenUtils {
@@ -47,10 +47,11 @@ public class GenUtils {
      * 生成代码
      */
     public static void generatorCode(Map<String, String> table,
-                                     List<Map<String, String>> columns,TargetDirectory directory) throws Exception {
+                                     List<Map<String, String>> columns, TargetDirectory directory) throws Exception {
         //配置信息
         Configuration config = getConfig();
         boolean hasBigDecimal = false;
+        boolean hasTimestamp = false;
         //表信息
         TableEntity tableEntity = new TableEntity();
         tableEntity.setTableName(table.get("tableName"));
@@ -77,8 +78,15 @@ public class GenUtils {
             //列的数据类型，转换成Java类型
             String attrType = config.getString(columnEntity.getDataType(), "unknowType");
             columnEntity.setAttrType(attrType);
+            //转成大写
+            columnEntity.setDataType(column.get("dataType").toUpperCase());
+            //判断是否有BigDecimal
             if (!hasBigDecimal && attrType.equals("BigDecimal")) {
                 hasBigDecimal = true;
+            }
+            //判断是否有Timestamp
+            if(!hasTimestamp && attrType.equals("Timestamp")){
+                hasTimestamp = true;
             }
             //是否主键
             if ("PRI".equalsIgnoreCase(column.get("columnKey")) && tableEntity.getPk() == null) {
@@ -89,7 +97,7 @@ public class GenUtils {
         }
         tableEntity.setColumns(columsList);
 
-//        //没主键，则第一个字段为主键
+        //没主键，则第一个字段为主键
         if (tableEntity.getPk() == null) {
             tableEntity.setPk(tableEntity.getColumns().get(0));
         }
@@ -98,8 +106,8 @@ public class GenUtils {
         Properties prop = new Properties();
         prop.put("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
         Velocity.init(prop);
-        String mainPath = config.getString("mainPath");
-        mainPath = StringUtils.isBlank(mainPath) ? "io.renren" : mainPath;
+//        String mainPath = config.getString("mainPath");
+//        mainPath = StringUtils.isBlank(mainPath) ? "com.xxt" : mainPath;
         //封装模板数据
         Map<String, Object> map = new HashMap<>();
         map.put("tableName", tableEntity.getTableName());
@@ -110,7 +118,8 @@ public class GenUtils {
         map.put("pathName", tableEntity.getClassname().toLowerCase());
         map.put("columns", tableEntity.getColumns());
         map.put("hasBigDecimal", hasBigDecimal);
-        map.put("mainPath", mainPath);
+        map.put("hasTimestamp", hasTimestamp);
+//        map.put("mainPath", mainPath);
         map.put("poPackage", directory.getPackagePoName());
         map.put("daoPackage", directory.getPackageDaoName());
         map.put("moduleName", config.getString("moduleName"));
@@ -129,8 +138,8 @@ public class GenUtils {
             FileOutputStream output = null;
             try {
                 String fileName = getFileName(directory, template, tableEntity.getClassName());
-                System.out.println("===fileName==="+fileName);
-                File file = new File(getFileName(directory,template, tableEntity.getClassName()));
+                System.out.println("===fileName===" + fileName);
+                File file = new File(getFileName(directory, template, tableEntity.getClassName()));
                 output = new FileOutputStream(file);
                 output.write(sw.toString().getBytes("UTF-8"));
             } catch (Exception e) {
@@ -171,18 +180,17 @@ public class GenUtils {
     /**
      * 获取文件名
      */
-    public static String getFileName(TargetDirectory directory,String template, String className) {
+    public static String getFileName(TargetDirectory directory, String template, String className) {
         String projectName = null;
 
         //项目目录
-        if(StringUtils.isNotBlank(directory.getProjectName())){
-            projectName = mdkir(directory.getProjectName().replace("/","\\"));
+        if (StringUtils.isNotBlank(directory.getProjectName())) {
+            projectName = mdkir(directory.getProjectName().replace("/", "\\"));
         }
 
         //entity
         if (template.contains("Entity.java.vm")) {
 //            return packagePath + "entity" + File.separator + className + "Entity.java";
-            System.out.println("进来了");
             String pathEntity = projectName + File.separator + directory.getBasePackagePoName().replace("/", "\\") +
                     File.separator + directory.getPackagePoName().replace(".", File.separator);
             pathEntity = mdkir(pathEntity);
@@ -237,13 +245,13 @@ public class GenUtils {
     }
 
     //如果没有目录则创建
-    public static String mdkir(String mdkir){
+    public static String mdkir(String mdkir) {
         try {
             File file = new File(mdkir);
-            if(!file.exists()){
+            if (!file.exists()) {
                 file.mkdirs();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("创建失败");
         }
         return mdkir;
