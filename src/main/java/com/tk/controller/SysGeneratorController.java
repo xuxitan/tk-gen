@@ -20,8 +20,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -41,10 +44,12 @@ public class SysGeneratorController {
 	@ResponseBody
 	@RequestMapping("/list")
 	public R list(@RequestParam Map<String, Object> params){
+
         PageUtils pageUtil = sysGeneratorService.queryList(new Query(params));
-		return R.ok().put("page", pageUtil);
-	}
-	
+        return R.ok().put("page", pageUtil);
+    }
+
+
 	/**
 	 * 生成代码
 	 */

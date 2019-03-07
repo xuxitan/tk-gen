@@ -69,12 +69,24 @@ var vm = new Vue({
                 alert("实体类包名不能为空");
                 return false;
             }
+            if (!this.basePackagePoName) {
+                alert("实体类基础包名不能为空");
+                return false;
+            }
             if (!this.packageDaoName) {
                 alert("mapper(dao)包名不能为空");
                 return false;
             }
+            if (!this.basePackageDaoName) {
+                alert("mapper(dao)基础包名不能为空");
+                return false;
+            }
             if (!this.packageMapperXmlName) {
                 alert("xml文件包名不能为空");
+                return false;
+            }
+            if (!this.basePackageMapperXmlName) {
+                alert("xml文件基础包名不能为空");
                 return false;
             }
             this.projectName = this.projectName.replace(/\\/g, "/");
@@ -84,6 +96,7 @@ var vm = new Vue({
                 "&packageMapperXmlName=" + this.packageMapperXmlName + "&basePackageMapperXmlName=" + this.basePackageMapperXmlName;
 
         }
-    }
+    },
+
 });
 

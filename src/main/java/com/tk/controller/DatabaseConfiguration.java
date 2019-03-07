@@ -25,8 +25,8 @@ public class DatabaseConfiguration {
         dataSource.setPassword(password);
 
 //        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-//        dataSource.setUrl("jdbc:mysql://62.234.120.239:3306/generator?useUnicode=true&characterEncoding=UTF-8&useSSL=false");
-//        dataSource.setUsername("root");
+//        dataSource.setUrl("jdbc:mysql://192.168.1.246:8066/odm?useUnicode=true&characterEncoding=UTF-8&useSSL=false");
+//        dataSource.setUsername("odm");
 //        dataSource.setPassword("123456");
 
         //配置初始化大小、最小、最大
